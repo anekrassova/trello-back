@@ -1,11 +1,16 @@
 import express from "express";
 import userRoutes from "./routes/UserRoutes.js";
+import boardRoutes from "./routes/BoardRoutes.js";
 import mongoose from "mongoose";
+import cors from "cors";
 
 const app = express();
 
+app.use(cors());
+
 app.use(express.json());
 app.use("/api/auth", userRoutes);
+app.use("/api/boards", boardRoutes);
 
 const PORT = process.env.PORT || 3000;
 
