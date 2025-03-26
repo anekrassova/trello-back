@@ -44,6 +44,20 @@ router.delete("/:id", authMiddleware, async (req, res) => {
       .status(err.status || 500)
       .json({ message: err.message || "Internal server error." });
   }
-})
+});
+
+router.put("/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { newTitle } = req.body;
+
+  try {
+    const response = await boardService.editBoard(id, newTitle);
+    res.status(response.status).json({message: response.message, data: response.data});
+  } catch (err) {
+    res
+      .status(err.status || 500)
+      .json({ message: err.message || "Internal server error." });
+  }
+});
 
 export default router;

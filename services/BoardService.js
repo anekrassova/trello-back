@@ -1,62 +1,89 @@
-import {Board} from '../models/Board.js';
+import { Board } from '../models/Board.js';
+import { convertID } from './convertID.js';
 
 export class BoardService {
   // метод для получения всех досок пользователя
-  async getAllBoardsByUser(userId){
-    try{
+  async getAllBoardsByUser(userId) {
+    try {
       const boards = await Board.find({ user: userId });
 
-      const modifiedBoards = boards.map(board => {
-        const boardObj = board.toObject();
-        boardObj.id = boardObj._id;
-        delete boardObj._id;
-        return boardObj;
-      });
+      const modifiedBoards = boards.map((board) => convertID(board));
 
       return {
         status: 200,
         data: modifiedBoards,
       };
-    } catch(err){
+    } catch (err) {
       throw {
         status: 500,
-        message: "Internal server error.",
+        message: 'Internal server error.',
         error: err.message,
       };
     }
   }
 
   // метод для создания доски
-  async createBoard(title, userId){
-    try{
-      const board = new Board({title, user: userId});
+  async createBoard(title, userId) {
+    try {
+      const board = new Board({ title, user: userId });
       await board.save();
-
-      const boardObj = board.toObject();
-      boardObj.id = boardObj._id;
-      delete boardObj._id;
 
       return {
         status: 200,
-        data: boardObj,
-      }
-    } catch(err){
+        data: convertID(board),
+      };
+    } catch (err) {
       throw {
         status: 500,
-        message: "Internal server error.",
+        message: 'Internal server error.',
         error: err.message,
       };
     }
   }
 
   // метод для удаления доски
-  async deleteBoard(boardId){
-    const boardToDelete = await Board.findOneAndDelete({_id: boardId})
+  async deleteBoard(boardId) {
+    try {
+      const boardToDelete = await Board.findByIdAndDelete(boardId);
 
-    if(!boardToDelete){
-      throw { status: 404, message: "Task not found" };
+      if (!boardToDelete) {
+        throw { status: 404, message: 'Board not found' };
+      }
+
+      return { status: 204, message: 'Successfully deleted.' };
+    } catch (err) {
+      throw {
+        status: 500,
+        message: 'Internal server error.',
+        error: err.message,
+      };
     }
+  }
 
-    return { status: 204, message: "Successfully deleted." };
+  // метод для обновления названия доски
+  async editBoard(boardId, newTitle) {
+    try {
+      const updatedBoard = await Board.findByIdAndUpdate(
+        boardId,
+        { title: newTitle },
+        { new: true }
+      );
+
+      if (!updatedBoard) {
+        throw { status: 404, message: 'Board not found' };
+      }
+
+      return {
+        status: 200,
+        message: 'Board updated successfully',
+        data: convertID(updatedBoard),
+      };
+    } catch (err) {
+      throw {
+        status: 500,
+        message: 'Internal server error.',
+        error: err.message,
+      };
+    }
   }
 }
