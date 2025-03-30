@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/auth', userRoutes);
 app.use('/api/boards', boardRoutes);
-app.use('api/columns', columnRoutes);
+app.use('/api/columns', columnRoutes);
 app.use('/api/cards', cardRoutes);
 
 const PORT = process.env.PORT || 3000;

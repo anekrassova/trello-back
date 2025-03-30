@@ -5,7 +5,7 @@ const router = express.Router();
 const cardService = new CardService();
 
 // Получение всех карточек по columnId
-router.get('/:columnId/cards', async (req, res) => {
+router.get('/:columnId', async (req, res) => {
   const { columnId } = req.params;
 
   try {
@@ -41,6 +41,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
+  console.log('Получены данные для обновления:', updates);
 
   try {
     const response = await cardService.updateCard(id, updates);

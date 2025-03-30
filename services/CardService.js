@@ -7,7 +7,7 @@ export class CardService {
     const cards = await Card.find({ column: columnId });
 
     const modifiedCards = cards.map((card) => {
-      convertID(card);
+      return convertID(card);
     });
 
     return {
@@ -52,7 +52,7 @@ export class CardService {
 
   // удаление карточки
   async deleteCard(cardId) {
-    const cardToDelete = await Card.findOneAndDelete(cardId, {});
+    const cardToDelete = await Card.findOneAndDelete({ _id: cardId });
 
     if (!cardToDelete) {
       return {

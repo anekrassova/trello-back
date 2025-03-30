@@ -1,5 +1,9 @@
 import { Board } from '../models/Board.js';
 import { convertID } from './convertID.js';
+import { Column } from '../models/column.js';
+import { ColumnService } from './ColumnService.js';
+
+const columnService = new ColumnService();
 
 export class BoardService {
   // метод для получения всех досок пользователя
@@ -44,7 +48,14 @@ export class BoardService {
   // метод для удаления доски
   async deleteBoard(boardId) {
     try {
-      const boardToDelete = await Board.findByIdAndDelete(boardId);
+      const columnsToDelete = await Column.find({ board: boardId }).select(
+        '_id'
+      );
+      for (const column of columnsToDelete) {
+        await columnService.deleteColumn(column._id);
+      }
+
+      const boardToDelete = await Board.findByIdAndDelete({ _id: boardId });
 
       if (!boardToDelete) {
         throw { status: 404, message: 'Board not found' };

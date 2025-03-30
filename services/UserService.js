@@ -90,7 +90,7 @@ export class UserService {
             const token = jwt.sign(
                 { id: existingUser._id, email: existingUser.email },
                 this.jwtSecret,
-                { expiresIn: "1h" },
+                { expiresIn: "7d" },
             );
 
             // возвращение токена и объекта пользователя без пароля

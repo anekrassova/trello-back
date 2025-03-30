@@ -1,6 +1,7 @@
 import { Column } from '../models/Column.js';
 import { Board } from '../models/board.js';
 import { convertID } from './convertID.js';
+import { Card } from '../models/card.js';
 
 export class ColumnService {
   // получение колонок по boardId
@@ -8,7 +9,7 @@ export class ColumnService {
     const columns = await Column.find({ board: boardId });
 
     const modifiedColumns = columns.map((column) => {
-      convertID(column);
+      return convertID(column);
     });
 
     return {
@@ -32,7 +33,8 @@ export class ColumnService {
 
   // удаление колонки
   async deleteColumn(columnId) {
-    const columnToDelete = await Column.findOneAndDelete(columnId, {});
+    await Card.deleteMany({ column: columnId });
+    const columnToDelete = await Column.findOneAndDelete({ _id: columnId });
 
     if (!columnToDelete) {
       return {
