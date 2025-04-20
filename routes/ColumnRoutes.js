@@ -37,6 +37,25 @@ router.post('/', async (req, res) => {
   }
 });
 
+// перетаскивание колонки
+router.put('/reorder', async (req, res) => {
+  try {
+    const { boardId, orderedColumnIds } = req.body;
+
+    const response = await columnService.reorderColumns(
+      boardId,
+      orderedColumnIds
+    );
+
+    res
+      .status(response.status)
+      .json(response.data || { message: response.message });
+  } catch (err) {
+    console.error('Unexpected error during reorder:', err);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
 // изменение
 router.put('/:id', async (req, res) => {
   const columnId = req.params.id;

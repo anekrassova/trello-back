@@ -20,7 +20,14 @@ export class ColumnService {
 
   // создание колонки в доске
   async createColumn(boardId, columnTitle) {
-    const newColumn = new Column({ title: columnTitle, board: boardId });
+    const columnsCount = await Column.countDocuments({ board: boardId });
+
+    const newColumn = new Column({
+      title: columnTitle,
+      board: boardId,
+      position: columnsCount,
+    });
+
     await newColumn.save();
 
     const columnObj = convertID(newColumn);
@@ -70,5 +77,32 @@ export class ColumnService {
       status: 200,
       data: updatedColumnObj,
     };
+  }
+
+  // изменение положения колонки
+  async reorderColumns(boardId, orderedColumnIds) {
+    if (!boardId || !Array.isArray(orderedColumnIds)) {
+      return {
+        status: 400,
+        message: 'Invalid boardId or column order',
+      };
+    }
+
+    try {
+      for (let i = 0; i < orderedColumnIds.length; i++) {
+        const columnId = orderedColumnIds[i];
+        await Column.findByIdAndUpdate(columnId, { position: i });
+      }
+
+      return {
+        status: 200,
+        data: { message: 'Columns reordered successfully' },
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Failed to reorder columns',
+      };
+    }
   }
 }
