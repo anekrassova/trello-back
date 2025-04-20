@@ -67,4 +67,28 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// перетаскивание карточки
+router.put('/:id/move', async (req, res) => {
+  const { id } = req.params;
+  const { sourceColumnId, destColumnId, destIndex } = req.body;
+
+  try {
+    const response = await cardService.moveCard(
+      id,
+      sourceColumnId,
+      destColumnId,
+      destIndex
+    );
+
+    res
+      .status(response.status)
+      .json(
+        response.data ? { data: response.data } : { message: response.message }
+      );
+  } catch (err) {
+    console.error('Ошибка перемещения карточки:', err);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+});
+
 export default router;

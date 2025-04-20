@@ -66,4 +66,39 @@ export class CardService {
       message: 'Successfully Deleted',
     };
   }
+
+  // изменение положения карточки
+  async moveCard(cardId, sourceColumnId, destColumnId, destIndex) {
+    const card = await Card.findById(cardId);
+    if (!card) {
+      return {
+        status: 404,
+        message: 'Card not found',
+      };
+    }
+
+    const isSameColumn = sourceColumnId === destColumnId;
+
+    if (!isSameColumn) {
+      card.column = destColumnId;
+    }
+
+    let cardsInDest = await Card.find({ column: destColumnId }).sort(
+      'position'
+    );
+
+    cardsInDest = cardsInDest.filter((c) => c.id !== cardId);
+
+    cardsInDest.splice(destIndex, 0, card);
+
+    for (let i = 0; i < cardsInDest.length; i++) {
+      cardsInDest[i].position = i;
+      await cardsInDest[i].save();
+    }
+
+    return {
+      status: 200,
+      message: 'Card moved successfully',
+    };
+  }
 }
